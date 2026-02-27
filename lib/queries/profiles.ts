@@ -28,7 +28,7 @@ export async function getProfile(userId: string) {
   return data as Profile
 }
 
-export async function updateProfile(updates: Partial<Pick<Profile, 'display_name' | 'avatar_url' | 'bio' | 'status'>>) {
+export async function updateProfile(updates: Partial<Pick<Profile, 'display_name' | 'avatar_url' | 'bio' | 'status' | 'banner_color' | 'show_staff_badge'>>) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
