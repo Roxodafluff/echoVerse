@@ -12,6 +12,8 @@ export interface Profile {
   bio: string
   status: UserStatus
   global_role: GlobalRole
+  banner_color: string
+  show_staff_badge: boolean
   created_at: string
 }
 

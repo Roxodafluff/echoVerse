@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { UserAvatar } from '@/components/ui/user-avatar'
+import { StaffBadge } from '@/components/ui/staff-badge'
+import { UserProfilePopover } from '@/components/ui/user-profile-popover'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Pencil, Trash2, Smile } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { editMessage, deleteMessage, addReaction, removeReaction } from '@/lib/queries/messages'
-import type { Message } from '@/lib/types'
+import type { Message, Profile } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😢', '🔥', '🎉']
@@ -79,11 +81,27 @@ export function MessageItem({ message, currentUserId, isCompact }: MessageItemPr
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      {!isCompact && (
+      {!isCompact && profile && (
+        <UserProfilePopover
+          profile={profile as Profile}
+          isOwnProfile={isOwn}
+          side="right"
+          align="start"
+        >
+          <UserAvatar
+            src={profile.avatar_url}
+            username={profile.username ?? ''}
+            status={profile.status}
+            size="md"
+            showStatus={false}
+            className="mt-0.5"
+          />
+        </UserProfilePopover>
+      )}
+      {!isCompact && !profile && (
         <UserAvatar
-          src={profile?.avatar_url}
-          username={profile?.username ?? ''}
-          status={profile?.status}
+          src={undefined}
+          username="?"
           size="md"
           showStatus={false}
           className="mt-0.5"
@@ -91,10 +109,28 @@ export function MessageItem({ message, currentUserId, isCompact }: MessageItemPr
       )}
       <div className="flex-1 overflow-hidden">
         {!isCompact && (
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm font-semibold text-foreground">
-              {profile?.display_name || profile?.username || 'Unknown'}
-            </span>
+          <div className="flex items-center gap-2">
+            {profile ? (
+              <UserProfilePopover
+                profile={profile as Profile}
+                isOwnProfile={isOwn}
+                side="right"
+                align="start"
+              >
+                <span className="text-sm font-semibold text-foreground hover:underline">
+                  {profile.display_name || profile.username || 'Unknown'}
+                </span>
+              </UserProfilePopover>
+            ) : (
+              <span className="text-sm font-semibold text-foreground">Unknown</span>
+            )}
+            {profile && (
+              <StaffBadge
+                role={profile.global_role}
+                showBadge={profile.show_staff_badge}
+                iconOnly
+              />
+            )}
             <span className="text-[11px] text-muted-foreground">
               {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
             </span>
